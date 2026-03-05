@@ -52,7 +52,7 @@ The goal is to produce the first macro indicator tracking **female aesthetic inv
 
 This repository currently includes:
 
-• Housing desirability analysis (data science project)  
+• housing desirability analysis (data science project)  
 
 Future additions will include:
 
