@@ -1,0 +1,424 @@
+---
+title: "Final Project-ADS 500B"
+author: "Audrey Dilgarde"
+date: "2025-12-08"
+output: 
+  pdf_document:
+    toc: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen = 999)
+
+library(dplyr)
+```
+
+## Importing The Dataset
+
+I imported the 'house_sales.csv' file into R using 'read.csv()' and stored it into the data frame 'house_sales'.
+
+```{r import dataset}
+house_sales <- read.csv("house_sales.csv")
+head(house_sales)
+```
+
+## Dataset Overview
+
+In this step, I began by examining the structure of the house_sales dataset to understand the types of variables and overall dimensions. I then ran summary commands to identify which columns contained missing values and how many missing entries each column had. This allowed me to see that four columns (bedrooms, bathrooms, sqft_living, and sqft_lot) contain missing values with a total of 4,356 missing entries, all of which are numerical variables. This infomation will guide my data-cleaning decisions in the next section.
+
+```{r data overview}
+str(house_sales)
+```
+
+```{r missing values}
+missing_counts <- colSums(is.na(house_sales))
+missing_counts
+
+number_columns_with_counts <- sum(missing_counts > 0)
+number_columns_with_counts
+
+total_missing_count <- sum(missing_counts)
+total_missing_count
+```
+
+## Data Cleaning
+
+Because all missing values occur in numeric variables, I decided to replace them with the median of their respective columns. This is preferable to replacing them with 0, which would incorrectly imply that some homes have 0 bathrooms, bedrooms, or square footage. The median is a robust measure of central tendency that is not heavily influenced by outliers, so this replacement preserves the typical value of each variable while only slightly altering the shape of the distribution.
+
+```{r data wrangling}
+columns_with_missing_values <- c("bedrooms", "bathrooms", 
+                                 "sqft_living", "sqft_lot")
+
+for (col in columns_with_missing_values) { 
+  
+  median_house_sales <- median(house_sales[[col]], na.rm = TRUE)
+  house_sales[[col]][is.na(house_sales[[col]])] <- median_house_sales
+}
+
+colSums(is.na(house_sales[ , columns_with_missing_values]))
+```
+
+## Feature Construction
+
+For feature engineering, I created new variables to better capture the desirability and condition of the homes. First, I constructed bed_bath_total (bedrooms + bathrooms) and bath_per_bed (bathrooms divided by bedrooms) to summarize the overall comfort and potential crowdedness of each homes. Second, I defined premium_view and premium_view_score to indicate whether a home has any attractive view (waterfront or non-zero view rating) and to assign a simple view "score." Finally, I derived year_sold, age, renovated, and years_since_reno to measure how old each property was at the time of sale and how recently it had been updated. These engineered features provide more interpretable measures of quality and desirrability that I can use in my clustering and visualization steps.
+
+```{r feature construction}
+house_sales$bed_bath_total <- house_sales$bedrooms + house_sales$bathrooms
+
+house_sales$bath_per_bed <- ifelse(house_sales$bedrooms > 
+                                     0, house_sales$bathrooms / 
+                                     house_sales$bedrooms, NA)
+
+house_sales$premium_view <- ifelse(house_sales$waterfront == 
+                                     1 | house_sales$view > 0, 1, 0)
+
+house_sales$premium_view_score <- 2 * house_sales$waterfront + house_sales$view
+
+house_sales$year_sold <- as.numeric(substr(house_sales$date, 1, 4))
+
+house_sales$age <- house_sales$year_sold - house_sales$yr_built
+
+house_sales$renovated <- ifelse(house_sales$yr_renovated > 0, 1, 0)
+
+house_sales$years_since_reno <- ifelse(house_sales$yr_renovated > 
+                                         0, house_sales$year_sold - 
+                                         house_sales$yr_renovated, NA)
+
+head(house_sales[, c("bed_bath_total", "bath_per_bed", "premium_view", 
+                     "premium_view_score", "year_sold", "age", "renovated", 
+                     "years_since_reno")])
+```
+
+## Aggregation
+
+To study the neighborhood-level patterns in home desirability, I aggregated the house-level data to the zipcode level. For each zipcode I computed the mean and median sale price, the average combined number of bedrooms and bathrooms, the average premium view score, the share of homes with any premium view, and the total number of recorded sales. This procuded a zipcode_summary table ordered from the most to least expensive zipcodes by mean price. 
+
+This aggregation lets me compare "wealthy" neighborhoods on several interpretable dimensions: 1. how expensive homes are on average, 2. how large and comfortable they tend to be (via mean_bed_bath_total), 3. and how common premium views are (premium_view_share and mean_premium_score). For exmaple, zipcodes 98039, 98004, and 98040 sit at the top of the distribution by mean price; these neighborhoods tend to have larger homes suggesting clusters of high-end housing markets that I can sutdy in further in this investigation.
+
+```{r aggregation}
+zipcode_summary <- house_sales %>% group_by(zipcode) %>% 
+  summarise(mean_price = mean(price), median_price = median(price), 
+            mean_bed_bath_total = mean(bed_bath_total), mean_premium_score = mean(premium_view_score), premium_view_share = mean(premium_view), 
+            n_sales = n()) %>% arrange(desc(mean_price)) 
+
+print(zipcode_summary, n = Inf)
+```
+
+## Reducing Redundant Variables
+
+To reduce redundant data, I removed variables that were either pure identifiers or made obsolete by my engineered features. Specifically, I dropped id, date (replaced by year_sold), and yr_renovated (replaced by the renovated and years_since_reno). I also reviewed waterfront and view as these were combined into the more interpretable premium_view and premium_view_Score. All other variables were retained for subsequent visualization, correlation, and regression analyses.
+```{r redundant variable reduction}
+house_sales <- house_sales %>% select(-id,-date,-yr_renovated,-waterfront,-view)
+names(house_sales)
+```
+## Discretization
+
+To perform need-based discretization, I converted the continuous zipcode-level mean price into a binary category. Using the 90th percentile of mean_price as a threshold, I created a wealthy_neighborhoods variable that labels zipcodes in the top 10% of mean prices as "wealthy (top 10%)" and the remaining zipcodes as "non-wealthy (bottom 90%)." This tiering allows me to compare characteristics of wealthy neighborhoods to all others in the subsequent analysis.
+```{r discretization}
+zipcode_summary <- zipcode_summary %>% 
+  mutate(wealthy_neighborhoods = 
+           ifelse(mean_price >= quantile(mean_price, 0.9), 
+                  "wealthy (top 10%)", "non-wealthy (bottom 90%)"))
+table(zipcode_summary$wealthy_neighborhoods)
+```
+
+## Identifying Categorical, Ordinal, and Numerical Variables
+Variables are classified by how they are measured and their intended use. 
+
+Numerical variables represent quantities where differences and ratios are meaninful. In my data, price, sqft_living, sqft_lot, sqft_above, sqft_basement, sqft_living15, sqft_lot15, bed_bath_total, bath_per_bed, age, year_sold, and premium_view_score are all numerical because they measure continuous or count-like quantities (dollars, square footage, years, number of rooms). The engineered variable years_since_reno is also numerical, because it counts how many years have passed since renovation for homes that were renovated. 
+
+Ordidnal variables are coded as integers, but the numbers represent ordered levels rather than precise distances. Both grade and condition fall into this category: a higher value indicates a better quality home but the difference betwwen grades 7 and 8 is not guaranteed to be the same as between grades 8 and 9. I therefore treat these as ordered ratings rather than true continuous measurements.
+
+Categorical variables represent labels or group membership where the numeric codes themselves have no quantitative meaning. zipcode is categorical because each categorical because each code identifies a geographic area but "98178" ia not "greather than" "98028" in a numerical sense. The indicators premium_view and renovated are binary categorical variables (0/1) showing absence or presence of a property feature. My discretized wealthy_neighborhoods variable is also categorical, assigning each zipcode to "wealthy (top 10%)" or "non-wealthy (bottom 90%)" for later group comparisons.
+
+For the engineered years_since_reno feature, I only compute values for homes that were actually renovated. Properties with yr_renovated = 0 are coded as NA in years_since_reno, indicating that "years since renovation" is not applicable rather than truly missing data. In contrast, geniune missing values in the original numeric variables (bedrooms, bathrooms, sqft_living, sqft_lot) were imputed using the median, as described in the data cleaning section. 
+```{r variable types}
+str(house_sales)
+```
+
+## Summary Statistics For Desirability Variables
+I first computed summary statistics for variables tied to home desirability: price, overall size (bed_bath_total and bath_per_bed), age, view quality (premium_view_score), and years_since_reno for renovated homes. This provides measures of central tendency (mean/median) and spread (quartiles, min/max) before looking at relationships between variables.  
+```{r desirability stats}
+desirability_stats <-  house_sales %>% select(price, bed_bath_total, 
+bath_per_bed, age, premium_view_score, years_since_reno)
+
+summary(desirability_stats)
+```
+## Desirability Distributions
+Across all six histograms, the distributions are strongly right-skewed: most homes cluster in a fairly typical range, with a small number of extremely "fancy" cases that stretch my along the right tail. This pattern is most dramatic for sale price, where the bulk of houses under 700K-800K USD, but a small set of mult-million-dollar properties pushes the maximum towards 8 million USD. This aligns with the summary statistics, where the mean price is higher than the median. 
+
+The bed_bath_total histogram shows that most homes offer between 4 and 7 combined bedrooms and bathrooms, with a very thin tail of very large houses (over 15 total rooms) that likely correspond to luxury properties. The bath_per_bed distribution is tightly 0.5 and 1.0, indicating that a "normal" configuratio for a home within the dataset is about one bathroom for every 1-2 bedrooms, with only a few outlier homes that are unusually generous in bathroom cout. 
+
+For age, after setting a handful of negative values to 0 (due to data issues where year_sold and yr_built were inconsistent), most homes are between 0 to 60 years old, with a decreasing tail that stops at 120 years. This suggests a housing stock that is mostly mid-century (1935-1975) or newer, with a smaller share of very old homes that may be historically or architecturally distinctive. 
+
+The premium_view_score histogram highlights how rare premium views actually are. The vast majority of homes have a score of 0, with progressively fewer properties at scores of 1 to 6. In other words, waterfront and high-end view ratings are concentrated in a relatively small share of the market, which fits the idea that views are a scarcity feature that can command higher prices. 
+
+Finally, for years_since_reno, I restricted the distirbution to homes that were actually renovated and removed negative or missing values. Among renovated properties, most updates occured within the last 10-30 years, with relatively few very recent (0-5 years) or very old (40+ years) renovations. This suggests that when renovations do happen, they are often neither brand-new flips nor extremely dated (although, who doesn't love a home with character); instead, many homes sit in a middle band of "relatively recent" updates. 
+Taken together, these distributions support my desirability story: large, recently updated homes with generous bathroom coverage and premium views exist, but they sit in the long right tails of the histograms rather than representing the typical house. In the next section, I use correlations to quantify how these desirability variables relate to sale price overall, and then compare how those relationships differ between wealthy and non-wealthy neighborhoods. 
+```{r histogram plot of house prices}
+price_hist <- house_sales$price
+
+hist(price_hist, breaks = 40, col = "hotpink", border = "black", 
+main = "Distribution of Sale Prices", xlab = "House Prices", 
+ylab = "Number of Houses", xaxt = "n", cex.main = 1.6, cex.lab = 1.3)
+
+ticks <- pretty(price_hist, n = 5)
+ 
+axis(1, at = ticks, labels = format(ticks, big.mark = ","), cex.axis = 1.1, 
+     las = 1)
+
+```
+
+```{r histogram plot of bedrooms & bathrooms}
+bedroom_bathroom_hist <- house_sales$bed_bath_total
+bedroom_bathroom_hist <- bedroom_bathroom_hist[!is.na(bedroom_bathroom_hist)]
+
+hist(bedroom_bathroom_hist, breaks = pretty(bedroom_bathroom_hist), 
+     col = "hotpink", border = "black", 
+     main = "Distribution of Total Bedrooms & Bathrooms", 
+     xlab = "Bedrooms & Bathrooms", ylab = "Count", cex.main = 1.6, 
+     cex.lab = 1.3, cex.axis = 1.1)
+```
+```{r histogram of bathrooms per bedroom}
+bathrooms_per_bedroom_hist <- house_sales$bath_per_bed
+bathrooms_per_bedroom_hist <- 
+  bathrooms_per_bedroom_hist[!is.na(bathrooms_per_bedroom_hist)]
+
+hist(bathrooms_per_bedroom_hist, breaks = pretty(bathrooms_per_bedroom_hist),
+     col = "hotpink", border = "black", main = "Distribution of Bathrooms 
+     Per Bedroom", xlab = "Bathrooms per Bedroom", ylab = "Count", cex.main = 
+       1.6, cex.lab = 1.3, cex.axis = 1.1)
+```
+```{r histogram of age of homes}
+house_sales$age[house_sales$age < 0] <- 0
+
+home_age <- house_sales$age
+home_age <- home_age[!is.na(home_age)]
+
+hist(home_age, breaks = pretty(home_age), col = "hotpink", border = "black",
+     main = "Distribution of Home Age", xlab = "Age of Home (Years)", ylab = 
+       "Count", cex.main = 1.6, cex.lab = 1.3, cex.axis = 1.1)
+```
+
+```{r historgram of premium view score}
+premium_view_score_hist <- house_sales$premium_view_score
+premium_view_score_hist <- premium_view_score_hist[!is.na(premium_view_score_hist)]
+
+hist(premium_view_score_hist, breaks = seq(floor(min(premium_view_score_hist)),
+                                           ceiling(max(premium_view_score_hist)), 
+                                           by = 1), col = "hotpink", border = 
+       "black", main = "Distribution of Premium View Score", xlab = "Premium 
+     View Score", ylab = "Count", cex.main = 1.6, cex.lab = 1.3, cex.axis = 1.1 )
+```
+
+```{r histogram of years since renovation}
+years_since_reno_hist <- house_sales$years_since_reno[house_sales$renovated == 1]
+years_since_reno_hist <- years_since_reno_hist[ years_since_reno_hist >= 0 & 
+                                                  !is.na( years_since_reno_hist)]
+
+hist(years_since_reno_hist, breaks = pretty(years_since_reno_hist), col = "hotpink", 
+     border = "black", main = "Distribution of Years Since Renovation", xlab = 
+  "Years Since Renovation", ylab = "Count", cex.main = 1.6, cex.lab = 1.3, 
+cex.axis = 1.1)
+```
+
+## Correlations & Identifying Independent and Dependent Variables
+After mapping out the desirability distributions, I next looked at how these variables move together and which ones should play the role of predictors versus outcomes. At the house level, I treat sale price as the primary outcome: it is the thing prospective homeowners ultimately care about and the quantity I want to explain. My engineered desirability features - overall size (bed_bath_total), bathroom crowdedness (bath_per_bed), view quality (premium_view_score), age, and renovation timing (years_since_reno) - are used as independent variables. 
+
+The correlation matrix confirms and sharpens the story from the histograms. Price is moderately correlated with both total bedrooms-plus-bathrooms (r ~0.41), which fits the idea that large homes with better views sit in the "fancy" tail of the price distribution. Bathroom coverage and renovation timing show weaker but still meaningful relationships with price (r ~0.26 for bath_per_bed, r ~-0.13 for years_since_reno), suggesting that eextra bathrooms and more recent updates make a small dent in addition to the existing home size and view. Age by itself has almost no linear relatoinship with price (r ~-0.05), consistent with the idea that both very old and very new homes can be expensive depending on their other amenities. 
+
+At the zipcode level, I summarize these desirability features and compare them across my discretized wealthy vs non-wealthy groupings. The boxplots show that wealthy zipcodes not only have higher mean prices but also larger homes and a higher share of premium views, so the neighborhood-level pattern mirrors the house-level correlations. Together, the distributions, correlations, boxplots, and scatterplots tell a coherent story: desirability variables behave like plausible "drivers" or price.
+
+What I don't yet know is whether the market naturally organizes itself into distinct clusters of desirability. If I ignore sale price and just look at the feature space, do homes fall into clusters like "starter homes", "middle market homes", and "premium homes"? And do those clusters line up with price and wealthy neighborhoods the way I think they should? That is the question I take up in my final step. 
+```{r correlations among desirability variabes}
+
+desirability_correlation_variables <- house_sales %>% select(price, bed_bath_total,
+                                                    bath_per_bed, age,
+                                                    premium_view_score, 
+                                                    years_since_reno)
+
+desirability_correlations <- cor(desirability_correlation_variables,
+                                 use = "pairwise.complete.obs")
+
+desirability_correlations
+```
+```{r wealthy vs non-wealthy neighborhoods boxplots}
+zipcode_summary$wealthy_neighborhoods <- factor(zipcode_summary$wealthy_neighborhoods, 
+                                                levels = c("non-wealthy (bottom 90%)",
+                                                           "wealthy (top 10%)"),
+                                                labels = c("non-wealthy\n(bottom 90%)",
+                                                           "wealthy\n(top 10%%)"))
+
+par(mfrow = c(1,3), mar = c(7, 4, 4, 1) + 0.1, cex.axis = 0.6, cex.lab = 0.9, 
+    cex.main = 1.1)
+    
+boxplot(mean_price ~ wealthy_neighborhoods, data = zipcode_summary, 
+        col = "hotpink",
+        border = "black", main = "Mean Sale Price \nby Neighborhood Wealth", 
+        xlab = "Neighborhood Wealth", ylab = "Mean Sale Price")
+
+boxplot(premium_view_share ~ wealthy_neighborhoods, data = zipcode_summary, 
+        col = "hotpink",border = "black", 
+        main = "Premium View Share \nby Wealth", xlab = "Neighborhood Wealth",
+        ylab = "Share of Homes with Premium View")
+
+boxplot(mean_bed_bath_total ~ wealthy_neighborhoods, data = zipcode_summary,
+        col = "hotpink", border = "black", 
+        main = "Bedrooms & Bathrooms \nby Wealth", xlab = "Neighborhood Wealth",
+        ylab = "Mean Bedroom & Bathrooms")
+
+par(mfrow = c(1,1 ))
+```
+```{r price vs total bedrooms & bathrooms scatterplot}
+plot(house_sales$bed_bath_total, house_sales$price, pch = 16, 
+     col = rgb(1, 0.41, 0.71, 0.3), xlab = "Total Bedrooms & Bathrooms", 
+     ylab = "Sale Price", main = "Relationship Between Home Size and Sale Price", 
+     yaxt = "n")
+
+price_ticks <- pretty(house_sales$price)
+axis(2, at = price_ticks, labels = format(price_ticks, big.mark = ","),
+     cex.axis = 0.7)
+
+abline(lm(price ~ bed_bath_total, data = house_sales), lwd = 2)
+```
+```{r price vs premium view score scatterplot}
+plot(house_sales$premium_view_score, house_sales$price, pch = 16, 
+     col = rgb(1, 0.41, 0.71, 0.3), xlab = "Premium View Score", 
+     ylab = "Sale Price", 
+     main = "Relationship Between View Quality and Sale Price", yaxt = "n")
+
+price_ticks <- pretty(house_sales$price)
+axis(2, at = price_ticks, labels = format(price_ticks, big.mark = ","),
+     cex.axis = 0.7)
+
+abline(lm(price ~ premium_view_score, data = house_sales), lwd = 2)
+```
+```{r price vs years since renovation_only for renovated homes}
+reno_data <- subset(house_sales, !is.na(years_since_reno))
+
+plot(reno_data$years_since_reno, reno_data$price, pch = 16, 
+     col = rgb(1, 0.41, 0.71, 0.3), xlab = "Years Since Renovation", 
+     ylab = "Sale Price", main = "Effect of Renovation Recency on Sale Price", 
+     yaxt = "n")
+
+price_ticks <- pretty(house_sales$price)
+axis(2, at = price_ticks, labels = format(price_ticks, big.mark = ","),
+     cex.axis = 0.7)
+
+abline(lm(price ~ years_since_reno, data = reno_data), lwd = 2)
+```
+
+## Unsupervised Learning: Does Desirability Garner A Premium?
+To close the analysis, I switched from a supervised mindset to an unsupervised one. Instead of asking "how well can we predict price from desirability?"; I asked a deeper question: "if I completely ignore sale price and neighborhood wealth and only look at the desirability features, does the market naturally sort homes into distinct clusters? And if so, do those clusters line up with the price and wealthy zipcode story my data has been building thus far?"
+
+I built a clustering dataset at the house level using four standardized features: total bedrooms and bathrooms, bathrooms per bedroom, premium view score, and years since renovation. Running k-means with three clusters and multiple random starts produced a solution that explains about 41% of the variance in the k-means analysis. When I bring price back into the conversation for interpretation purposes, the clusters fall into clear categories; one group of smaller, older, low-view homes with the loweest prices; a mid-high group of larger, recently renovated but mostly non-view homes; and a high-end group of big, bathroom-rich houses with high premium view scores and the highest prices. The clustering algorithm never saw price, yet it recreated the "starter / middle market / premium" structure implied by my histograms and correlations. 
+
+I then linked these house-level clusters back to my wealthy vs non-wealthy zipcode labels. As only 10% of zipcodes are defined as wealthy, 10% is the natural baseline share for each cluster if desirability clusters were randomly scattered across neighborhoods. Instead, the low-desirability cluster has only about 7% of its homes in wealthy zipcodes, while the two higher-desirability clusters come in around 14% and 19% wealthy, respectively. In other words, premium and renovated clusters are over-represented in wealthy neighborhoods, and the modest cluster is under-represented. The "missing" low-desirability homes in rich areas are part of the evidence: it's a 1-p argument that strengthens the story rather than weakening it. 
+
+For evaluation, I treat the 41% variance as an internal quality check that the clusters are non-trivial, and the alignment with price and neighborhood wealth as an external validity check. Without ever being told what "expensive" or "wealthy" means, k-means rediscovers clusters that behave exactly like clusters of housing desirability: as you move from the modest cluster to the premium view-heavy and renovated clusters, both prices and the share of wealthy neighborhoods rise. The unsupervised learning step doesn't overturn my earlier conclusions; it stress-tests them and reaffirms that desirability does, in fact, garner a premium in this housing market. 
+```{r k_means clustering}
+cluster_desirability_data <- house_sales %>% 
+  select(price, bed_bath_total, bath_per_bed, premium_view_score, 
+         years_since_reno, zipcode) %>% na.omit()
+
+desirability_matrix <- cluster_desirability_data %>% select(bed_bath_total,
+                                                            bath_per_bed, 
+                                                            premium_view_score, 
+                                                            years_since_reno)
+
+desirability_scaled <- scale(desirability_matrix)
+
+set.seed(123)
+
+k_means_3 <- kmeans(desirability_scaled, centers = 3, nstart = 25)
+
+
+
+cluster_desirability_data$cluster_3 <- factor(k_means_3$cluster, levels = 1:3,
+                                              labels = c("Cluster 1", "Cluster 2",
+                                                         "Cluster 3"))
+
+total_within <- k_means_3$tot.withinss
+proportion_variance <- k_means_3$betweenss / k_means_3$totss
+
+total_within
+proportion_variance
+
+cluster_desirability_data_summary <- cluster_desirability_data %>% 
+  group_by(cluster_3) %>% summarise(n = dplyr::n(), mean_price = mean(price), 
+                                    mean_bed_bath_total = mean(bed_bath_total), 
+                                    mean_bath_per_bed = mean(bath_per_bed), 
+                                    mean_view_score = mean(premium_view_score), 
+                                    mean_years_since_reno = mean(years_since_reno), 
+                                    .groups = "drop")
+
+cluster_desirability_data_summary
+
+cluster_wealth_crosstab <- table(cluster_desirability_data$cluster_3, zipcode_summary$wealthy_neighborhoods[match(cluster_desirability_data$zipcode, 
+                                                                                                                  zipcode_summary$zipcode)])
+
+cluster_wealth_crosstab
+
+cluster_colors <- c("deeppink", "purple", "lightblue1")
+
+plot(cluster_desirability_data$bed_bath_total, 
+     cluster_desirability_data$premium_view_score, 
+     col = cluster_colors[cluster_desirability_data$cluster_3],
+     pch = 16, xlab = "Total Bedrooms & Bathrooms", ylab = "Premium View Score",
+     main = "Desirability Clusters in Size-View Space")
+
+legend("topleft", legend = c("Cluster 1", "Cluster 2", "Cluster 3"), 
+       col = cluster_colors, pch = 16, pt.cex = 1.2, bty = "n")
+
+plot(cluster_desirability_data$bed_bath_total, cluster_desirability_data$price, 
+     col = cluster_colors[cluster_desirability_data$cluster_3], pch = 16, 
+     xlab = "Total Bedrooms & Bathrooms", ylab = "Sale Price", 
+     main = "Sale Price by Desirability Clusters", yaxt = "n")
+
+price_ticks <- pretty(house_sales$price)
+axis(2, at = price_ticks, labels = format(price_ticks, big.mark = ","),
+     cex.axis = 0.7)
+
+legend("topleft", legend = c("Cluster 1", "Cluster 2", "Cluster 3"), 
+       col = cluster_colors, pch = 16, pt.cex = 1.2, bty = "n")
+```
+
+
+## References
+
+Bobbitt, Z. (2020, November 18). *Understanding Heteroscedasticity in Regression Analysis.* 
+Statology. <https://www.statology.org/heteroscedasticity-regression/>
+
+Bhalla, D. (n.d.). *IF ELSE CONDITIONS IN R (WITH EXAMPLES).* <https://www.listendata.com/2017/03/if-else-in-r.html>
+
+Data Carpentry. (n.d.). *Aggregating and analyzing data with dplyr.* <https://datacarpentry.github.io/R-genomics/04-dplyr.html>
+
+Galli, S. (2022, July 4). *Data discretization in machine learning* Train in Data. <https://www.blog.trainindata.com/data-discretization-in-machine-learning/>
+
+Geeksforgeeks. (2025, November 29). *Aggregation in Data Mining.* <https://www.geeksforgeeks.org/data-analysis/aggregation-in-data-mining/>
+
+Geeksforgeeks.(2025, November 08). *What is Feature Engineering?* <https://www.geeksforgeeks.org/machine-learning/what-is-feature-engineering/>
+
+Huynh, W. (2019, August 06). *Advanced Data Management: ifelse().*\
+R for Graduate Students. <https://bookdown.org/yih_huynh/Guide-to-R-Book/ifelse.html>
+
+Maddula, S. (2025, March 19). *Feature Engineering in Machine Learning: A Practical Guide.* <https://www.datacamp.com/tutorial/feature-engineering>
+
+Mounish, V. (2024, November 22). *What is Discretization in Machine Learning?* Analytics Vidhya. <https://www.analyticsvidhya.com/blog/2024/11/discretization/>
+
+OpenAI. (2025). *ChatGPT[Large language model].* <https://chat.openai.com>
+
+R bloggers. (2022, March 16). *R Data types 101, or What kind of data do I have?* <https://www.r-bloggers.com/2022/03/r-data-types-101-or-what-kind-of-data-do-i-have/>
+
+Sanderson, S.P. (2024, December 2). *How to Replace Missing Values in R: A Comprehensive Guide.* <https://www.spsanderson.com/steveondata/posts/2024-12-02/>
+
+Smola, A. and Vishwanathan, S. (2008). *Introduction to Machine Learning.* Cambridge University Press. <https://alex.smola.org/drafts/thebook.pdf>
+
+Wikipedia. (n.d.). *Feature engineering* <https://en.wikipedia.org/wiki/Feature_engineering#Clustering>
+
+Wentworth Studio. (n.d.). *Mid-Century Modern Style (1935–1975).* <https://www.wentworthstudio.com/historic-styles/mid-century-modern>
+
+## Artifical Intelligence Disclosure
+I used GPT as a support tool for this project similar to an advanced search engine. GPT helped me recall R syntax, debug plotting choices (e.g., labels, margins, colors), and structure the k-means clustering code and evaluation steps. All analytical decisions, interpretations, and final edits are my own.
