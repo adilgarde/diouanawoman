@@ -24,7 +24,7 @@ My work blends several domains:
 
 • Behavioral economics  
 • Jungian archetypal psychology  
-• Natural language processing  
+• Behavioral text analysis and sentiment modeling
 • Psychometrics  
 • Large-scale behavioral data analysis  
 
