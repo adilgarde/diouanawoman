@@ -14,25 +14,25 @@ The Diouana Womanomics framework treats beauty spending not as frivolous consump
 
 Using behavioral data, sentiment analysis, and archetypal psychology, the research investigates:
 
-• how aesthetic investments influence social mobility  
-• how identity evolves through consumption patterns  
-• how beauty markets function as hidden economic infrastructure  
+* how aesthetic investments influence social mobility  
+* how identity evolves through consumption patterns  
+* how beauty markets function as hidden economic infrastructure  
 
 ## Current Research Direction
 
 My work blends several domains:
 
-• Behavioral economics  
-• Jungian archetypal psychology  
-• Behavioral text analysis and sentiment modeling
-• Psychometrics  
-• Large-scale behavioral data analysis  
+* Behavioral economics  
+* Jungian archetypal psychology  
+* Text analysis and sentiment modeling  
+* Psychometrics 
+* Large-scale behavioral data analysis  
 
 Users in the Diouana Womanomics ecosystem log beauty spending and tag the perceived return on investment across three dimensions:
 
-• Social ROI  
-• Psychological ROI  
-• Financial ROI  
+* Social ROI  
+* Psychological ROI  
+* Financial ROI  
 
 This data is used to construct models that track **identity evolution through consumption patterns**.
 
@@ -42,9 +42,9 @@ One of the long-term goals of this research is the development of the **Diouana 
 
 The index integrates:
 
-• macro price data (beauty CPI)  
-• platform behavioral spending data  
-• sentiment analysis of user experiences  
+* macro price data (beauty CPI)  
+* platform behavioral spending data  
+* sentiment analysis of user experiences  
 
 The goal is to produce the first macro indicator tracking **female aesthetic investment as economic activity**.
 
@@ -52,13 +52,13 @@ The goal is to produce the first macro indicator tracking **female aesthetic inv
 
 This repository currently includes:
 
-• housing desirability analysis (data science project)  
+* housing desirability analysis (data science project)  
 
 Future additions will include:
 
-• archetype classification models  
-• sentiment analysis pipelines  
-• erotic capital measurement frameworks 
+* archetype classification models  
+* sentiment analysis pipelines  
+* erotic capital measurement frameworks 
 
 ## Author
 
