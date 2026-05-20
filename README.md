@@ -56,14 +56,6 @@ The long-term ambition of Diouana Womanomics is to build a research practice tha
 - beauty-market data
 - archetypal classification systems
 
-Future work may include:
-
-- archetype classification models
-- sentiment analysis pipelines
-- beauty spending datasets
-- erotic capital measurement frameworks
-- early prototypes for the Diouana Woman Economic Index
-
 The **Diouana Woman Economic Index** is a long-term research concept for tracking female aesthetic investment as a meaningful economic signal.
 
 ## Repository Contents
@@ -71,10 +63,7 @@ The **Diouana Woman Economic Index** is a long-term research concept for trackin
 This repository may include:
 
 - R Markdown working papers
-- PDF working paper exports
-- exploratory data analysis projects
 - early modeling prototypes
-- data science coursework-adjacent experiments
 - research notes related to Erotic Capital Economics
 
 ## Author
