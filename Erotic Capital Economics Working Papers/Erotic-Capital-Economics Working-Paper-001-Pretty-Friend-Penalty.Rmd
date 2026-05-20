@@ -25,6 +25,11 @@ library(tidyverse)
 library(knitr)
 library(grid)
 
+round_half_up <- function(x, digits = 0) {
+  multiplier <- 10^digits
+  floor(x * multiplier + 0.5) / multiplier
+}
+
 set.seed(2026)
 ```
 
@@ -74,7 +79,10 @@ archetype_colors <- c(
 )
 
 knitr::kable(
-  archetypes,
+  archetypes %>%
+    mutate(
+      across(c(S, D, B, V, M), ~ round_half_up(.x, 2))
+    ),
   digits = 2,
   caption = "Illustrative archetypal parameters for the Pretty Friend Penalty model."
 )
@@ -157,6 +165,13 @@ cat("\\renewcommand{\\arraystretch}{1.08}\n")
 
 knitr::kable(
   edges %>%
+    mutate(
+      attention_gap = round_half_up(attention_gap, 3),
+      desirability_insecurity = round_half_up(desirability_insecurity, 2),
+      self_concept_instability = round_half_up(self_concept_instability, 2),
+      projection = round_half_up(projection, 3),
+      friendship_next = round_half_up(friendship_next, 3)
+    ) %>%
     select(
       observer = from,
       target = to,
@@ -181,6 +196,7 @@ knitr::kable(
 )
 
 cat("\\endgroup\n")
+```
 
 
 ```{r network-diagram}
@@ -236,7 +252,7 @@ plot_edges <- edges %>%
     y_start = y_from + uy * node_radius,
     x_end = x_to - ux * node_radius,
     y_end = y_to - uy * node_radius,
-    edge_label = paste0("P = ", sprintf("%.3f", round(projection + 1e-10, 3))),
+    edge_label = paste0("P = ", sprintf("%.3f", round_half_up(projection, 3))),
     label_x = case_when(
       from == "Maiden" & to == "Lover" ~ -0.38,
       from == "Maiden" & to == "Huntress" ~ 0.86,
@@ -288,7 +304,11 @@ ggplot() +
   ) +
   geom_text(
     data = node_pos,
-    aes(x = m_x, y = m_y, label = paste0("M = ", sprintf("%.2f", M))),
+    aes(
+      x = m_x,
+      y = m_y,
+      label = paste0("M = ", sprintf("%.2f", round_half_up(M, 2)))
+    ),
     color = "gray20",
     size = 3.0
   ) +
