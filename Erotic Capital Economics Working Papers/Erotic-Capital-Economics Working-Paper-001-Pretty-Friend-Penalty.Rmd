@@ -2,7 +2,7 @@
 title: "The Pretty Friend Penalty"
 subtitle: "A Network Model of Beauty, Projection, and Female Social Instability"
 author: "Diouana Woman®"
-date: "May 19, 2026"
+date: "May 20, 2026"
 output: 
   pdf_document:
     latex_engine: xelatex
@@ -30,7 +30,7 @@ set.seed(2026)
 
 ## Abstract
 
-This working paper models the destabilization of female friendship networks under uneven distributions of male attention. Using a toy network model, the paper argues that beauty functions not merely as an individual attribute but as a  perceived social position. When women are socialized to treat desirability as evidence of worth, another woman's beauty may be misread as access, protection, or rank. The model introduces projection intensity as a function of attention gaps, scarcity beliefs, and self-concept instability. The central claim is simple: sometimes women do not dislike another woman because of who she is; they dislike her because of what they believe her beauty gives her. 
+This working paper answers a simple social question: what happens when women hate you because men want you? Using a toy network model, the paper models the destabilization of female friendship networks under uneven distributions of male attention. It argues that beauty functions not merely as an individual attribute but as a  perceived social position. When women are socialized to treat desirability as evidence of worth, another woman's beauty may be misread as access, protection, or rank. The model introduces projection intensity as a function of attention gaps, scarcity beliefs, and self-concept instability. The central claim is simple: sometimes women do not dislike another woman because of who she is; they dislike her because of what they believe her beauty gives her. 
 
 ## Introduction
 Female friendship is often described through the language of solidarity, sisterhood, and emotional intimacy (Doherty, 2021). Yet this language can obscure the ways beauty, desirability, and male attention quietly reorganize the social field among women. In certain settings, beauty does not merely function as an aesthetic trait. It functions as rank (Mears, 2020). 
@@ -236,7 +236,7 @@ plot_edges <- edges %>%
     y_start = y_from + uy * node_radius,
     x_end = x_to - ux * node_radius,
     y_end = y_to - uy * node_radius,
-    edge_label = paste0("P = ", sprintf("%.3f", projection)),
+    edge_label = paste0("P = ", sprintf("%.3f", round(projection + 1e-10, 3))),
     label_x = case_when(
       from == "Maiden" & to == "Lover" ~ -0.38,
       from == "Maiden" & to == "Huntress" ~ 0.86,
@@ -313,7 +313,7 @@ ggplot() +
   )
 ```
 
-The directed network visualization shows that projection does not move evenly across the friendship group. Projection is strongest when an archetype with lower desirability security and lower self-concept stability observes another archetype receiving greater male attention. This is why direction matters: the Lover may not project onto the Maiden, even if the Maiden projects onto the Lover. The model therefore captures a common asymmetry in female social life, where one woman experiences rivalry while the other experiences mere coexistence (Hooks, 1986).
+The directed network visualization shows that projection does not move evenly across the friendship group. Projection is strongest when an archetype with lower desirability security and lower self-concept stability observes another archetype receiving greater male attention. This is why direction matters: the Lover may not project onto the Maiden, even if the Maiden projects onto the Lover. The model therefore captures a common asymmetry in female social life, where one woman experiences rivalry while the other experiences mere coexistence (hooks, 1986).
 
 ## Discussion
 The simulation suggests that beauty does not destabilize female friendship by itself. Rather, instability emerges when beauty is interpreted as social rank. Uneven male attention becomes socially meaningful when women are taught to experience desirability as scarce and to interpret another woman’s visibility as their own diminishment (Merrie et al., 2025).
