@@ -56,13 +56,6 @@ The long-term ambition of Diouana Womanomics is to build a research practice tha
 - beauty-market data
 - archetypal classification systems
 
-## Repository Contents
-
-This repository may include:
-
-- R Markdown working papers
-- research notes related to Erotic Capital Economics
-
 ## Author
 
 **Paule Audrey Dilgarde, also known as Diouana Woman®**
