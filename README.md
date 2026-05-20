@@ -65,7 +65,7 @@ This repository may include:
 
 ## Author
 
-**Audrey Dilgarde, also known as Diouana Woman®**
+**Paule Audrey Dilgarde, also known as Diouana Woman®**
 
 I am building a research and writing practice at the intersection of culture, behavioral economics, psychoanalysis, beauty, and data science.
 
