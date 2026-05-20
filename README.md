@@ -52,7 +52,9 @@ The goal is to produce the first macro indicator tracking **female aesthetic inv
 
 This repository currently includes:
 
-* housing desirability analysis (data science project)  
+* housing desirability analysis (data science project)
+* Erotic Capital Economics Working Papers
+*   001: The Pretty Friend Penalty: A Network Model of Beauty, Projection, and Female Social Instability
 
 Future additions will include:
 
@@ -65,4 +67,4 @@ Future additions will include:
 Audrey Dilgarde  
 Founder-Scholar, Diouana Womanomics
 
-My work sits at the intersection of culture, economics, and data science, with the long-term goal of developing **Erotic Capital Economics** as a new research discipline and school of thought.
+My work sits at the intersection of culture, behavoiral economics, and data science, with the long-term goal of developing **Erotic Capital Economics** as a new research discipline and school of thought.
