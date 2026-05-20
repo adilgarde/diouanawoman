@@ -1,70 +1,86 @@
 # Diouana Womanomics
 
-Research repository for the Diouana Womanomics project.
+**Diouana Womanomics** is a research project exploring beauty, desirability, identity, and economic behavior through the lens of data science, behavioral economics, and archetypal psychology.
 
-Diouana Womanomics is a psychoeconomic research initiative exploring **Erotic Capital as an emergent economic asset class**. The project investigates how women invest in beauty, identity, and aesthetic labor and how those investments translate into measurable economic and social outcomes.
+The project asks a central question:
 
-This repository contains experimental data science projects, modeling work, and analytical prototypes supporting the broader Diouana Womanomics research program.
+> What happens when beauty is treated not as frivolous consumption, but as economic behavior, symbolic capital, and social infrastructure?
 
-## Research Thesis
+This repository houses working papers, modeling experiments, and early analytical prototypes related to the development of **Erotic Capital Economics**.
 
-Traditional economics captures financial capital, human capital, and social capital, but it fails to quantify **erotic capital**—the economic influence of beauty, presence, desirability, and aesthetic self-investment.
+## Research Direction
 
-The Diouana Womanomics framework treats beauty spending not as frivolous consumption but as **strategic identity investment** and a means of sexual competition.
+Diouana Womanomics studies how women invest in beauty, self-presentation, ritual, and aesthetic labor, and how those investments shape social, psychological, and economic outcomes.
 
-Using behavioral data, sentiment analysis, and archetypal psychology, the research investigates:
+My current research interests include:
 
-* how aesthetic investments influence social mobility  
-* how identity evolves through consumption patterns  
-* how beauty markets function as hidden economic infrastructure  
+- erotic capital as an economic and social signal
+- beauty spending as identity investment
+- female self-concept and consumption behavior
+- archetypal psychology and behavioral segmentation
+- sentiment analysis of beauty and lifestyle narratives
+- social mobility, desirability, and symbolic power
+- network models of gendered social dynamics
 
-## Current Research Direction
+The broader goal is to develop **Erotic Capital Economics** as a research framework for studying how beauty, desirability, and aesthetic self-investment move through markets, relationships, and culture.
 
-My work blends several domains:
+## Keynote Essay
 
-* Behavioral economics  
-* Jungian archetypal psychology  
-* Text analysis and sentiment modeling  
-* Psychometrics 
-* Large-scale behavioral data analysis  
+A central essay for understanding the intellectual and personal origin of this project is:
 
-Users in the Diouana Womanomics ecosystem log beauty spending and tag the perceived return on investment across three dimensions:
+**[An Investment Bank Is A Bad Place To Find Out You're Sexually Attractive](https://www.diouanawoman.com/p/an-investment-bank?r=fk5gt&utm_campaign=post&utm_medium=web)**
 
-* Social ROI  
-* Psychological ROI  
-* Financial ROI  
+This essay serves as an entry point into the larger Diouana Womanomics world: beauty, ambition, class anxiety, social mobility, humiliation, reinvention, and the making of a woman’s self-concept.
 
-This data is used to construct models that track **identity evolution through consumption patterns**.
+## Current Work
 
-## The Diouana Woman Economic Index (DWEI)
+### Erotic Capital Economics Working Papers
 
-One of the long-term goals of this research is the development of the **Diouana Woman Economic Index (DWEI)** — a macroeconomic indicator designed to measure erotic capital as an economic signal.
+This repository includes short working papers that translate cultural and psychoeconomic questions into formal models.
 
-The index integrates:
+Current paper:
 
-* macro price data (beauty CPI)  
-* platform behavioral spending data  
-* sentiment analysis of user experiences  
+- **001: The Pretty Friend Penalty**  
+  *A Network Model of Beauty, Projection, and Female Social Instability*
 
-The goal is to produce the first macro indicator tracking **female aesthetic investment as economic activity**.
+This paper models how uneven distributions of male attention may destabilize female friendship networks when beauty is interpreted as social rank.
+
+## Long-Term Research Ambition
+
+The long-term ambition of Diouana Womanomics is to build a research practice that combines:
+
+- original theory
+- applied data science
+- behavioral modeling
+- text and sentiment analysis
+- beauty-market data
+- archetypal classification systems
+
+Future work may include:
+
+- archetype classification models
+- sentiment analysis pipelines
+- beauty spending datasets
+- erotic capital measurement frameworks
+- early prototypes for the Diouana Woman Economic Index
+
+The **Diouana Woman Economic Index** is a long-term research concept for tracking female aesthetic investment as a meaningful economic signal.
 
 ## Repository Contents
 
-This repository currently includes:
+This repository may include:
 
-* housing desirability analysis (data science project)
-* Erotic Capital Economics Working Papers
-*   001: The Pretty Friend Penalty: A Network Model of Beauty, Projection, and Female Social Instability
-
-Future additions will include:
-
-* archetype classification models  
-* sentiment analysis pipelines  
-* erotic capital measurement frameworks 
+- R Markdown working papers
+- PDF working paper exports
+- exploratory data analysis projects
+- early modeling prototypes
+- data science coursework-adjacent experiments
+- research notes related to Erotic Capital Economics
 
 ## Author
 
-Audrey Dilgarde  
-Founder-Scholar, Diouana Womanomics
+**Audrey Dilgarde, also known as Diouana Woman®**
 
-My work sits at the intersection of culture, behavoiral economics, and data science, with the long-term goal of developing **Erotic Capital Economics** as a new research discipline and school of thought.
+I am building a research and writing practice at the intersection of culture, behavioral economics, psychoanalysis, beauty, and data science.
+
+My career ambition is to develop Diouana Womanomics into a serious intellectual and analytical practice: part research lab, part cultural archive, and part school of thought.
