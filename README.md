@@ -61,7 +61,6 @@ The long-term ambition of Diouana Womanomics is to build a research practice tha
 This repository may include:
 
 - R Markdown working papers
-- early modeling prototypes
 - research notes related to Erotic Capital Economics
 
 ## Author
