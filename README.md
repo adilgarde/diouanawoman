@@ -56,8 +56,6 @@ The long-term ambition of Diouana Womanomics is to build a research practice tha
 - beauty-market data
 - archetypal classification systems
 
-The **Diouana Woman Economic Index** is a long-term research concept for tracking female aesthetic investment as a meaningful economic signal.
-
 ## Repository Contents
 
 This repository may include:
