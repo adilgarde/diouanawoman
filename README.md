@@ -6,7 +6,7 @@ The project asks a central question:
 
 > What happens when beauty is treated not as frivolous consumption, but as economic behavior, symbolic capital, and social infrastructure?
 
-This repository houses working papers, modeling experiments, and early analytical prototypes related to the development of **Erotic Capital Economics**.
+This repository houses working papers related to the development of **Erotic Capital Economics**.
 
 ## Research Direction
 
