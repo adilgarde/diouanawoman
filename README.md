@@ -62,4 +62,4 @@ The long-term ambition of Diouana Womanomics is to build a research practice tha
 
 I am building a research and writing practice at the intersection of culture, behavioral economics, psychoanalysis, beauty, and data science.
 
-My career ambition is to develop Diouana Womanomics into a serious intellectual and analytical practice: part research lab, part cultural archive, and part school of thought.
+My career ambition is to develop Diouana Womanomics into a rigorous intellectual and analytical practice: part research lab, part cultural archive, and part school of thought.
