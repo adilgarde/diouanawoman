@@ -36,14 +36,12 @@ This essay serves as an entry point into the larger Diouana Womanomics world: be
 
 ### Erotic Capital Economics Working Papers
 
-This repository includes short working papers that translate cultural and psychoeconomic questions into formal models.
-
 Current paper:
 
-- **001: The Pretty Friend Penalty**  
-  *A Network Model of Beauty, Projection, and Female Social Instability*
+- **002: The Assumption of Access**  
+  *A Toy Dyadic Model of Sex, Money, and Implicit Entitlement in Heterosexual Courtship*
 
-This paper models how uneven distributions of male attention may destabilize female friendship networks when beauty is interpreted as social rank.
+This paper models implicit expectations within heterosexual courtship, examining women's financial expectation curve vis-à-vis men's sexual expectation curve through the framework, The Assumption of Access.
 
 ## Long-Term Research Ambition
 
@@ -53,7 +51,7 @@ The long-term ambition of Diouana Womanomics is to build a research practice tha
 - applied data science
 - behavioral modeling
 - text and sentiment analysis
-- beauty-market data
+- micro beauty-market data
 - archetypal classification systems
 
 ## Author
