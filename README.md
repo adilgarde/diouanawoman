@@ -58,7 +58,7 @@ The long-term ambition of Diouana Womanomics is to build a research practice tha
 
 ## Author
 
-**Paule Audrey Dilgarde, also known as Diouana Woman®**
+** Audrey Dilgarde, also known as Diouana Woman®**
 
 I am building a research and writing practice at the intersection of culture, behavioral economics, psychoanalysis, beauty, and data science.
 
